@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+    <title>Form Reviews</title>
+    <link href="{% static 'css/review.css' %}" rel="stylesheet">
+</head>
+<body>
+    {% if messages  %}
+        {% include "partion/message.html" %}
+    {% endif %}
+    <div class="wrapper">
+        <h3 style="color: Green; font-weight: border ;">Khách hàng: {{detail.user.username}}<h3>
+        <h3>Review: {{detail.product.title}} </h3>
+        <img src="{{ detail.product.image_pro }}" style="height:150px; width:150px" alt="">
+        <form method="post" action="{% url 'add_review' product_id=detail.product.pro_id hoadon_id=detail.hoaDon.maHoaDon detail_id=detail.id %}">
+        <form method="post">
+            {% csrf_token %}
+            <div class="rating">
+                <input type="number" name="rating" hidden>
+                <i class='bx bx-star star' style="--i: 0;"></i>
+                <i class='bx bx-star star' style="--i: 1;"></i>
+                <i class='bx bx-star star' style="--i: 2;"></i>
+                <i class='bx bx-star star' style="--i: 3;"></i>
+                <i class='bx bx-star star' style="--i: 4;"></i>
+            </div>
+            <textarea name="opinion" cols="30" rows="5" placeholder="Your opinion..."></textarea>
+            <div class="btn-group">
+                <button type="submit" class="btn submit">Submit</button>
+                <button class="btn cancel">Cancel</button>
+            </div>
+        </form>
+    </div>
+<script type="text/javascript" src="{% static 'js/review.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Thanh Toán</title>
+    <link href="{% static 'css/thanhToan_Page.css' %}" rel="stylesheet">
+</head>
+<body>
+    <div class="checkout">
+        <h2>Thông Tin Thanh Toán</h2>
+        <form id="user-info-form" method="post" action="{% url 'dat_hang' %}">
+            {% csrf_token %}
+            {% for item in cart_items %}
+                <div class="cart-items">
+                    <div class="product">
+                        <div class="product-title">{{item.product.title}}</div>
+                        <div class="product-quantity">Số lượng: {{item.quantity}}</div>
+                        <div class="total-price">{{ item.total_price }}</div>
+                    </div>   
+                </div>
+            {% endfor %}
+            
+            <!-- Thêm trường ẩn để chứa tổng tiền -->
+            <input type="hidden" name="tong_tien" value="{{ total_amount }}">
+            
+            <div class="total-bill" id="total-bill">
+                Tổng tiền bill: {{total_amount}}
+            </div>
+            
+            <h2>Thông tin khách hàng</h2>
+            <label for="name">Họ và Tên:</label>
+            <input type="text" id="name" name="name" {% if user.is_authenticated %}value="{{ user.username }}"{% endif %} required>
+        
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" {% if user.is_authenticated %}value="{{ user.email }}"{% endif %} required>
+        
+            <label for="phone_number">Số Điện Thoại:</label>
+            <input type="tel" id="phone_number" name="phone_number" {% if user.is_authenticated %}value="{{ user.phone_number }}"{% endif %} required style="width: 100%; height:30px">
+        
+            <label for="address">Địa Chỉ:</label>
+            <textarea id="address" name="address" required>{% if user.is_authenticated %}{{ user.address }}{% endif %}</textarea>
+                    
+            <!-- Thêm button để lấy vị trí địa lý -->
+            <button type="button" id="get-location-button">Lấy Vị Trí Địa Lý</button>
+        
+            <!-- Chuyển thành nút submit để gửi form -->
+            <button type="submit" id="order-button">Đặt Hàng</button>
+        </form>
+            <!-- Hiển thị vị trí địa lý -->
+            <div id="location-display"></div>
+    </div>
+    <script>
+        document.getElementById('get-location-button').addEventListener('click', getLocation);
+    
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else {
+                alert("Trình duyệt của bạn không hỗ trợ lấy vị trí địa lý.");
+            }
+        }
+    
+        function showPosition(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+    
+            // Cập nhật giá trị của trường địa chỉ trong form
+            const addressField = document.getElementById('address');
+            addressField.value = `Latitude: ${latitude}, Longitude: ${longitude}`;
+
+            // Hiển thị vị trí địa lý
+            document.getElementById('location-display').innerHTML = `Vị trí địa lý: Latitude ${latitude}, Longitude ${longitude}`;
+        }
+    </script>
+</body>
+</html>

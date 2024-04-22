@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Giỏ Hàng</title>
+    <link href="{% static 'css/cart_Page.css' %}" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>Giỏ Hàng Của Bạn</h1>
+    </header>
+    <div class="container">
+        <form method="post" action="{% url 'update_cart' %}">
+            {% csrf_token %}
+            {% for item in cart_items %}
+                <div class="cart-items">
+                    <div class="product">
+                        <img src="{{ item.product.image_pro }}" alt="{{ item.product.title }}">
+                        <h2 class="product-title">{{ item.product.title }} </h2>
+                        <input type="number" class="product-quantity" name="quantity_{{ item.id }}" min="1" value="{{ item.quantity }}">
+                    </div>   
+                </div>
+            {% endfor %}
+            <button type="submit" class="checkout-button">Thanh Toán</button>
+        </form>
+    </div>
+    
+</body>
+</html>

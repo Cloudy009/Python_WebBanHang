@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Giỏ Hàng</title>
+    <link href="{% static 'css/cart_Page.css' %}" rel="stylesheet">
+    <style>
+        .remove-btn 
+        {
+            background-color: #007bff; 
+            height: 25px; 
+            width: 40px;
+            color: #fff;
+            margin-top: 5px;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Giỏ Hàng Của Bạn</h1>
+    </header>
+    {% if messages  %}
+        {% include "partion/message.html" %}
+    {% endif %}
+    
+    <div class="container" >
+        <form method="post" action="{% url 'update_cart' %}">
+            {% csrf_token %}
+            {% for item in cart_items %}
+                <div class="cart-items">
+                    <div class="remove-btn" type="button" data-product-id="{{ item.product.pro_id }}">Xóa</div>
+                    <div class="product">
+                        <img src="{{ item.product.image_pro }}" alt="{{ item.product.title }}">
+                        <h2 class="product-title">{{ item.product.title }}</h2>
+                        <input type="number" class="product-quantity" name="quantity_{{ item.id }}" min="1" value="{{ item.quantity }}">
+                    </div>                         
+  
+                </div>
+            {% endfor %}
+            <button type="submit" class="checkout-button">Thanh Toán</button>
+        </form>
+    </div>
+    
+    <script>
+        document.querySelectorAll('.remove-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.getAttribute('data-product-id');
+                fetch('/remove_item/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ product_id: productId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Xóa sản phẩm khỏi giao diện người dùng
+                        const productElement = this.parentElement;
+                        productElement.remove();
+                        // Thêm thông báo đã xóa sản phẩm thành công vào messages
+                        const successMessage = "Xóa sản phẩm thành công";
+                        const messageContainer = document.querySelector('.message-container');
+                        messageContainer.textContent = successMessage;
+                        messageContainer.classList.add('success');
+                    } else {
+                        alert(data.message); // Hiển thị thông báo lỗi nếu có
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+        
+    </script>
+    
+    
+    
+</body>
+</html>

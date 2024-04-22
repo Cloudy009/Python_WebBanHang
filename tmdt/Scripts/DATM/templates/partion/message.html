@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="{% static 'css/message.css' %}">
+    </head>
+    <body>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="toasts">
+                {% if message.tags == 'success' %}
+                    <div class="toast success">
+                        <i class='bx bxs-check-circle'></i>
+                        <span>{{ message }}</span>
+                        <span class="cutdown"></span>
+                    </div>
+                {% elif message.tags == 'warning' %}
+                    <div class="toast warning">
+                        <i class='bx bxs-bug'></i>
+                        <span>{{ message }}</span>
+                        <span class="cutdown"></span>
+                    </div>
+                {% elif message.tags == 'error' %}
+                    <div class="toast error">
+                        <i class='bx bxs-error-circle'></i>
+                        <span>{{ message }}</span>
+                        <span class="cutdown"></span>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endif %}
+            
+    <script src="{% static 'js/message.js' %}"></script>
+    </body>
+</html>
+
+
+
+

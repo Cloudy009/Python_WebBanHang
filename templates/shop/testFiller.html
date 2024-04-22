@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Product Filter</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/product.css' %}" />
+</head>
+<body>
+<div class="container mt-5">
+    <div class="row">
+        <!-- Thanh lọc bên trái -->
+        <div class="col-md-3">
+            <h5>Filter Options</h5>
+            <div class="form-group">
+                <label for="category-filter">Category:</label>
+                <select id="category-filter" class="form-control">
+                    <option value="all">All</option>
+                    {% for category in categories %}
+                        <option value="{{ category.cate_id }}">{{ category.name }}</option>
+                    {% endfor %}
+                    <!-- ... -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="price-filter">Price Range:</label>
+                <select id="price-filter" class="form-control">
+                    <option value="all">All</option>
+                    <option value="0-20000">0 - 20000</option>
+                    <option value="20000-30000">20000 - 30000</option>
+                    <option value="30000-40000">30000 - 40000</option>
+                    <option value="40000-50000">40000 - 50000</option>
+                    <!-- Thêm các khoảng giá khác nếu cần -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="search-input">Search:</label>
+                <input type="text" id="search-input" class="form-control" placeholder="Enter product name">
+            </div>
+            <button class="btn btn-primary" onclick="applyFilters()">Search</button>
+        </div>
+        <!-- Khu vực hiển thị sản phẩm bên phải -->
+        <div class="col-md-9">
+            <h5>Product List</h5>
+            <div class="row" id="product-container">
+                {% for product in allProduct %}
+                    <div class="col-md-3 product" style=" text-align: center;" data-category="{{ product.category.cate_id }}" data-price="{{ product.price }}"> 
+                        <img src="{{ product.image_pro }}" alt="" style="height: 250px">
+                           
+                        <div class="info-product" style="margin-top: 5px">
+                            <h6 style="height: 30px">{{ product.title }}</h6>
+                            <p style="font-family: fantasy;">{{ product.price }}</p> 
+                        </div>
+                        <div class=" button-container">
+                            <div class="col-6">
+                                <a href="{% url 'product-detail' product_id=product.pro_id %}">
+                                    <button type="submit" class="btn btn-primary">Detail</button>
+                                </a>
+                            </div>
+                            <form method="post" action="{% url 'add_cart' %}">
+                                {% csrf_token %}
+                                <div class="col-6">
+                                    <input type="hidden" name="product_id" value="{{ product.pro_id }}">
+                                    <button type="submit" class="btn btn-primary">Buy</button>
+                                </div> 
+                            </form>
+                        </div>
+                    </div>
+                <!-- Thêm sản phẩm khác nếu cần -->
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+<script>
+    function applyFilters() {
+        var selectedCategory = document.getElementById('category-filter').value;
+        var selectedPriceRange = document.getElementById('price-filter').value;
+        var searchQuery = document.getElementById('search-input').value.toLowerCase();
+
+        var products = document.querySelectorAll('.product');
+
+        products.forEach(function (product) {
+            var categoryMatch = selectedCategory === 'all' || product.getAttribute('data-category') === selectedCategory;
+            var priceMatch = selectedPriceRange === 'all' || isPriceInRange(product.getAttribute('data-price'), selectedPriceRange);
+            var searchMatch = product.innerText.toLowerCase().includes(searchQuery);
+
+            if (categoryMatch && priceMatch && searchMatch) {
+                product.style.display = 'block';
+            } else {
+                product.style.display = 'none';
+            }
+        });
+    }
+
+    function isPriceInRange(price, range) {
+        var priceRanges = {
+            '0-20000': { min: 0, max: 20000 },
+            '20000-30000': { min: 20000, max: 30000 },
+            '30000-40000': { min: 30000, max: 40000 },
+            '40000-50000': { min: 40000, max: 50000 },
+            // Thêm các khoảng giá khác nếu cần
+        };
+
+        var selectedRange = priceRanges[range];
+        return price >= selectedRange.min && price <= selectedRange.max;
+    }
+</script>
+
+
+
+</body>
+</html>
