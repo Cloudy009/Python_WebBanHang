@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trang Chứa Chatbox</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <style>
+        /* CSS cho icon toggle */
+        #toggle-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .chatbox-container {
+            display: none;
+            overflow: hidden;
+            padding: 0.6rem;
+            border-radius: 2rem;
+            background: white;
+        }
+        .head
+        {
+            background: linear-gradient(270deg, hsl(293, 100%, 63%), hsl(264, 100%, 61%));
+            border-radius: 1.5rem 1.5rem 0.4rem 0.4rem;
+            color: white;
+        }
+        .head .notch
+        {
+            height: 1rem;
+            width: 47%;
+            background: white;
+            margin: 0 auto 0.5rem;
+            border-radius: 0 0 1rem 1rem;
+        }
+        .profilebox
+        {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0rem 1rem;
+        }
+        .profilebox .left
+        {
+            display: flex;
+            align-items: center;
+        }
+        .profilebox .left i{
+            margin-right: 0.5rem;
+        }
+        .left .profile
+        {
+            display: flex;
+            align-items: center;
+        }
+        .profile img
+        {
+            width: 1.7rem;
+            height: 1.7rem;
+            margin-right: 0.5rem;
+            border: 2px solid #e8e8e8;
+            border-radius: 100%;
+        }
+        .profile .pdetail h3
+        {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #e8e8e8;
+        }
+        .profile .pdetail p
+        {
+            font-size: 0.6rem;
+            color: #cacacac4;
+            font-weight: 400;
+        }
+        .mobile
+        {
+            width: 17rem;
+            min-width: 17rem;
+            overflow: hidden;
+            padding: 0.6rem;
+            border-radius: 2rem;
+            box-shadow: 1px 26px 23px #201e1e30;
+            background: white;
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- Button toggle -->
+    <button id="toggle-btn">Toggle Chat</button>
+        
+    <!-- Chatbox container -->
+    <div id="chatbox-container" class="chatbox-container">
+        <div class="mobile">
+            <div class="head">
+                <div class="notch"></div>
+                <div class="profilebox">
+                <div class="left">
+                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    <div class="profile">
+                    {% comment %} <img src="images/avatar.jpg" alt="dp"> {% endcomment %}
+                    <div class="pdetail">
+                        <h3>{{room}}</h3>
+                        <p>{{username}}</p>
+                    </div>
+                    </div>
+                </div>
+                <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                </div>
+            </div>
+            {% block content %}
+            <!-- Nội dung của chatbox sẽ được tải vào đây -->
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- Script để thực hiện toggle chatbox và load nội dung -->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+            // Toggle chatbox khi click vào button
+            $('#toggle-btn').click(function() {
+                $('#chatbox-container').slideToggle(); // Mở hoặc đóng chatbox
+            });
+
+            // Load nội dung của chatbox vào chatbox container
+            $('#chatbox-container').load('room.html');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+{% extends "index.html" %}
+
+{% block content %}
+  <style>
+  body {
+    margin: 0 auto;
+    max-width: 310px;
+    padding: 0 20px;
+  }
+
+  .container {
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
+    overflow-y: auto;
+    max-height: 300px;
+    max-width: 500px
+  }
+
+  .darker {
+    border-color: #ccc;
+    background-color: #ddd;
+  }
+
+  .container::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+
+  .container img {
+    float: left;
+    max-width: 60px;
+    width: 100%;
+    margin-right: 20px;
+    border-radius: 50%;
+  }
+
+  .container img.right {
+    float: right;
+    margin-left: 20px;
+    margin-right:0;
+  }
+
+  .time-right {
+    float: right;
+    color: #aaa;
+  }
+
+  .time-left {
+    float: left;
+    color: #999;
+  }
+
+  .sent {
+    margin-left: auto;
+    background-color: #007bff; /* Màu xanh cho tin nhắn của người gửi */
+    color: #fff; /* Màu chữ trắng */
+    max-width: 200px;
+  }
+
+  .recevied {
+    margin-right: auto;
+    max-width: 200px;
+    background: #e9d8f7;
+    border-radius: 0.7rem 0.7rem 0.7rem 0.2rem;
+    box-shadow: -1px 2px 2px #00000026;
+  }
+
+  .eachmessage {
+    font-size: 0.7rem;
+    width: 10rem;
+    padding: 0.5rem;
+    
+  }
+  
+  </style>
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <div id="display" class="container">
+    <!-- Tin nhắn sẽ được hiển thị ở đây -->
+
+  </div>
+
+  
+
+  <div class="container2">
+      <style>
+      input[type=text], select {
+      width: 100%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      display: inline-block;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      }
+
+      input[type=submit] {
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      }
+
+      input[type=submit]:hover {
+      background-color: #45a049;
+      }
+
+      div {
+      border-radius: 20px;
+     
+      }
+      .sendbox
+      {
+          position: relative;
+          background: #F5F3F8;
+          border-radius: 0 0 1.5rem 1.5rem;
+          padding: 0 0.5rem 0rem;
+      }
+      .sendbox input
+      {
+          border: 0;
+          outline: 0;
+          background: white;
+          width: 100%;
+          padding: 0.7rem;
+          border-radius: 2rem;
+       
+          color: black;
+          height: 2.3rem;
+      }
+      input::placeholder
+      {
+          font-size: 0.7rem;
+          color: rgb(173, 173, 173);
+      }
+      .sendbox button
+      {
+          position: absolute;
+          top: 0.7rem;
+          right: 0.7rem;
+          width: 2rem;
+          height: 2rem;
+          border: none;
+          outline: none;
+          background: #382153;
+          color: white;
+          border-radius: 100%;
+          cursor: pointer;
+      }
+      </style>
+
+      <form id="post-form">
+          {% csrf_token %}
+          <input type="hidden" name="username" id="username" value="{{username}}"/>
+          <input type="hidden" name="room_id" id="room_id" value="{{room_details.id}}"/>
+          
+          <div class="sendbox">
+            <input type="text" name="message" id="message" placeholder="Type a message…">
+            <button class="submit" value="Send"><i class="fa fa-chevron-right" aria-hidden="true"></i></button>
+          </div> 
+      </form>
+  </div>
+
+  <script>
+    $(document).ready(function(){
+        var autoScroll = true; // Biến để kiểm soát tự động cuộn
+    
+        setInterval(function(){
+            $.ajax({
+                type: 'GET',
+                url : "/getMessages/{{room}}/",
+                success: function(response){
+                    console.log(response);
+                    $("#display").empty();
+                    for (var key in response.messages)
+                    {
+                        var user = response.messages[key].user;
+                        var message = response.messages[key].value;
+                        var date = response.messages[key].date;
+                        var className = "container"; // Lớp mặc định
+                        
+                        // Kiểm tra xem người gửi có phải là người đăng nhập không
+                        if (user == "{{username}}") {
+                          className += " sent"; // Thêm lớp "sent" cho tin nhắn của người gửi
+                        }
+                        else
+                        {
+                          className += " recevied "
+                        }
+
+                        var temp = "<div class=' eachmessage " + className + "'><b>" + user + "</b><p>" + message + "</p><span>" + date + "</span></div>";
+                        $("#display").append(temp)
+                    }
+                    // Nếu tự động cuộn được kích hoạt, cuộn xuống cuối cùng của phần tử chứa tin nhắn
+                    if(autoScroll) {
+                        $('#display').scrollTop($('#display')[0].scrollHeight);
+                    }
+                },
+                error: function(response){
+                    alert('An error occured')
+                }
+            });
+        },1000);
+    
+        // Dừng tự động cuộn khi người dùng cuộn lên trên
+        $('#display').on('scroll', function(){
+            autoScroll = $(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight;
+        });
+    })
+    </script>
+
+  <script type="text/javascript">
+    $(document).on('submit','#post-form',function(e){
+      e.preventDefault();
+
+      $.ajax({
+        type:'POST',
+        url:'/send',
+        data:{
+            username:$('#username').val(),
+            room_id:$('#room_id').val(),
+            message:$('#message').val(),
+          csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success: function(data){
+          //alert(data)
+        }
+      });
+      document.getElementById('message').value = ''
+    });
+  </script>
+
+{% endblock %}
